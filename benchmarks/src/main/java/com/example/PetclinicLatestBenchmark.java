@@ -16,10 +16,6 @@
 
 package com.example;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -31,6 +27,10 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 @Measurement(iterations = 5)
 @Warmup(iterations = 1)
@@ -61,6 +61,31 @@ public class PetclinicLatestBenchmark {
 		state.run();
 	}
 
+	@Benchmark
+	public void explodedJarFlagsTiered(FlagsStateTiered state) throws Exception {
+		state.run();
+	}
+
+	@Benchmark
+	public void explodedJarFlagsHeadless(FlagsStateHeadless state) throws Exception {
+		state.run();
+	}
+
+	@Benchmark
+	public void explodedJarFlagsPerfDisabled(FlagsStatePerfDisabled state) throws Exception {
+		state.run();
+	}
+
+	@Benchmark
+	public void avx(AvxState state) throws Exception {
+		state.run();
+	}
+
+	@Benchmark
+	public void allInOne(FlagsStateAllInOne state) throws Exception {
+		state.run();
+	}
+
 	// @Benchmark
 	public void devtoolsRestart(ExplodedDevtoolsState state) throws Exception {
 		state.run();
@@ -79,7 +104,7 @@ public class PetclinicLatestBenchmark {
 					"--server.port=0");
 		}
 
-		@TearDown(Level.Iteration)
+		@TearDown(Level.Trial)
 		public void stop() throws Exception {
 			super.after();
 		}
@@ -93,7 +118,7 @@ public class PetclinicLatestBenchmark {
 					"--server.port=0");
 		}
 
-		@TearDown(Level.Iteration)
+		@TearDown(Level.Trial)
 		public void stop() throws Exception {
 			super.after();
 		}
@@ -108,7 +133,22 @@ public class PetclinicLatestBenchmark {
 			unpack("target/demo", jarFile("com.example:petclinic-latest:jar:boot:1.4.2"));
 		}
 
-		@TearDown(Level.Iteration)
+		@TearDown(Level.Trial)
+		public void stop() throws Exception {
+			super.after();
+		}
+	}
+
+	@State(Scope.Benchmark)
+	public static class AvxState extends ProcessLauncherState {
+		public AvxState() {
+			super("target/demo", "-XX:UseAVX=3", "-cp", CLASSPATH,
+				"org.springframework.samples.petclinic.PetClinicApplication",
+				"--server.port=0");
+			unpack("target/demo", jarFile("com.example:petclinic-latest:jar:boot:1.4.2"));
+		}
+
+		@TearDown(Level.Trial)
 		public void stop() throws Exception {
 			super.after();
 		}
@@ -126,7 +166,81 @@ public class PetclinicLatestBenchmark {
 			unpack("target/demo", jarFile("com.example:petclinic-latest:jar:boot:1.4.2"));
 		}
 
-		@TearDown(Level.Iteration)
+		@TearDown(Level.Trial)
+		public void stop() throws Exception {
+			super.after();
+		}
+	}
+
+	@State(Scope.Benchmark)
+	public static class FlagsStateTiered extends ProcessLauncherState {
+		public FlagsStateTiered() {
+			super("target/demo", "-noverify", "-XX:+TieredCompilation", "-XX:TieredStopAtLevel=1",
+				"-Djava.security.egd=file:/dev/./urandom",
+				"-Dspring.config.location=classpath:/application.properties",
+				"-Dspring.jmx.enabled=false", "-cp", CLASSPATH,
+				"org.springframework.samples.petclinic.PetClinicApplication",
+				"--server.port=0");
+			unpack("target/demo", jarFile("com.example:petclinic-latest:jar:boot:1.4.2"));
+		}
+
+		@TearDown(Level.Trial)
+		public void stop() throws Exception {
+			super.after();
+		}
+	}
+
+	@State(Scope.Benchmark)
+	public static class FlagsStateHeadless extends ProcessLauncherState {
+		public FlagsStateHeadless() {
+			super("target/demo", "-noverify", "-Djava.awt.headless=true", "-Dlog4j2.disable.jmx=true", "-XX:TieredStopAtLevel=1",
+				"-Djava.security.egd=file:/dev/./urandom",
+				"-Dspring.config.location=classpath:/application.properties",
+				"-Dspring.jmx.enabled=false", "-cp", CLASSPATH,
+				"org.springframework.samples.petclinic.PetClinicApplication",
+				"--server.port=0");
+			unpack("target/demo", jarFile("com.example:petclinic-latest:jar:boot:1.4.2"));
+		}
+
+		@TearDown(Level.Trial)
+		public void stop() throws Exception {
+			super.after();
+		}
+	}
+
+	@State(Scope.Benchmark)
+	public static class FlagsStatePerfDisabled extends ProcessLauncherState {
+		public FlagsStatePerfDisabled() {
+			super("target/demo", "-noverify", "-XX:+PerfDisableSharedMem", "-XX:-UsePerfData", "-XX:TieredStopAtLevel=1",
+				"-Djava.security.egd=file:/dev/./urandom",
+				"-Dspring.config.location=classpath:/application.properties",
+				"-Dspring.jmx.enabled=false", "-cp", CLASSPATH,
+				"org.springframework.samples.petclinic.PetClinicApplication",
+				"--server.port=0");
+			unpack("target/demo", jarFile("com.example:petclinic-latest:jar:boot:1.4.2"));
+		}
+
+		@TearDown(Level.Trial)
+		public void stop() throws Exception {
+			super.after();
+		}
+	}
+
+	@State(Scope.Benchmark)
+	public static class FlagsStateAllInOne extends ProcessLauncherState {
+		public FlagsStateAllInOne() {
+			super("target/demo", "-XX:+AlwaysPreTouch", "-noverify", "-XX:UseAVX=3", "-XX:+PerfDisableSharedMem", "-XX:-UsePerfData",
+				"-Djava.awt.headless=true", "-Dlog4j2.disable.jmx=true", "-XX:TieredStopAtLevel=1",
+				"-XX:+TieredCompilation",
+				"-Djava.security.egd=file:/dev/./urandom",
+				"-Dspring.config.location=classpath:/application.properties",
+				"-Dspring.jmx.enabled=false", "-cp", CLASSPATH,
+				"org.springframework.samples.petclinic.PetClinicApplication",
+				"--server.port=0");
+			unpack("target/demo", jarFile("com.example:petclinic-latest:jar:boot:1.4.2"));
+		}
+
+		@TearDown(Level.Trial)
 		public void stop() throws Exception {
 			super.after();
 		}

@@ -15,9 +15,6 @@
  */
 package com.example;
 
-import java.io.File;
-
-import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Level;
@@ -29,7 +26,9 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
 
-@Measurement(iterations = 5)
+import java.io.File;
+
+@Measurement(iterations = 2)
 @Warmup(iterations = 1)
 @Fork(value = 2, warmups = 0)
 @BenchmarkMode(Mode.AverageTime)
@@ -38,22 +37,7 @@ public class ConfigServerBenchmark {
 	private static final String CLASSPATH = "BOOT-INF/classes" + File.pathSeparator
 			+ "BOOT-INF/lib/*";
 
-	@Benchmark
-	public void fatJar14x(FatJar14xState state) throws Exception {
-		state.run();
-	}
-
-	@Benchmark
-	public void fatJar15x(FatJar15xState state) throws Exception {
-		state.run();
-	}
-
-	@Benchmark
-	public void fatJar13x(FatJar13xState state) throws Exception {
-		state.run();
-	}
-
-	@Benchmark
+	/*@Benchmark
 	public void devtoolsRestart(ExplodedDevtoolsState state) throws Exception {
 		state.run();
 	}
@@ -61,7 +45,7 @@ public class ConfigServerBenchmark {
 	@Benchmark
 	public void explodedJarMain(MainState state) throws Exception {
 		state.run();
-	}
+	}*/
 
 	public static void main(String[] args) throws Exception {
 		ExplodedDevtoolsState state = new ExplodedDevtoolsState();

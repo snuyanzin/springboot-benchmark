@@ -15,8 +15,6 @@
  */
 package com.example;
 
-import java.io.File;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -28,7 +26,9 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
 
-@Measurement(iterations = 5)
+import java.io.File;
+
+@Measurement(iterations = 2)
 @Warmup(iterations = 1)
 @Fork(value = 2, warmups = 0)
 @BenchmarkMode(Mode.AverageTime)
@@ -54,7 +54,7 @@ public class MinimalBenchmark {
 					"--server.port=0");
 		}
 
-		@TearDown(Level.Iteration)
+		@TearDown(Level.Trial)
 		public void stop() throws Exception {
 			super.after();
 		}
@@ -68,7 +68,7 @@ public class MinimalBenchmark {
 			unpack("target/demo", jarFile("com.example:minimal:0.0.1-SNAPSHOT"));
 		}
 
-		@TearDown(Level.Iteration)
+		@TearDown(Level.Trial)
 		public void stop() throws Exception {
 			super.after();
 		}

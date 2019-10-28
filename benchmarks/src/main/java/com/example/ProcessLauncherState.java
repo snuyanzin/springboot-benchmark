@@ -15,6 +15,9 @@
  */
 package com.example;
 
+import org.openjdk.jmh.util.FileUtils;
+import org.openjdk.jmh.util.Utils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -32,9 +35,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openjdk.jmh.util.FileUtils;
-import org.openjdk.jmh.util.Utils;
-
 public class ProcessLauncherState {
 
 	private Process started;
@@ -44,7 +44,8 @@ public class ProcessLauncherState {
 	public ProcessLauncherState(String dir, String... args) {
 		this.args = new ArrayList<>();
 		this.args.add(System.getProperty("java.home") + "/bin/java");
-		this.args.add("-Xmx128m");
+		this.args.add("-Xms1024m");
+		this.args.add("-Xmx1024m");
 		this.args.add("-Djava.security.egd=file:/dev/./urandom");
 		String vendor = System.getProperty("java.vendor", "").toLowerCase();
 		if (vendor.contains("ibm") || vendor.contains("j9")) {
@@ -76,6 +77,7 @@ public class ProcessLauncherState {
 	}
 
 	public Collection<String> capture(String... additional) throws Exception {
+		after();
 		List<String> args = new ArrayList<>(this.args);
 		args.addAll(Arrays.asList(additional));
 		ProcessBuilder builder = new ProcessBuilder(args);
@@ -91,6 +93,7 @@ public class ProcessLauncherState {
 	}
 
 	public void run() throws Exception {
+		after();
 		ProcessBuilder builder = new ProcessBuilder(args);
 		builder.directory(home);
 		builder.redirectErrorStream(true);
@@ -98,6 +101,7 @@ public class ProcessLauncherState {
 		if (!"false".equals(System.getProperty("debug", "false"))) {
 			System.err.println("Running: " + Utils.join(args, " "));
 		}
+
 		started = builder.start();
 		monitor();
 	}
@@ -116,10 +120,10 @@ public class ProcessLauncherState {
 		br = new BufferedReader(new InputStreamReader(inputStream));
 		String line = null;
 		while ((line = br.readLine()) != null && !line.contains(marker)) {
-			sb.append(line + System.getProperty("line.separator"));
+			sb.append(line).append(System.getProperty("line.separator"));
 		}
 		if (line != null) {
-			sb.append(line + System.getProperty("line.separator"));
+			sb.append(line).append(System.getProperty("line.separator"));
 		}
 		return sb.toString();
 	}

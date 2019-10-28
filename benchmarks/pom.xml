@@ -72,7 +72,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jmh.version>1.16</jmh.version>
+        <jmh.version>1.21</jmh.version>
         <java.version>1.8</java.version>
         <uberjar.name>benchmarks</uberjar.name>
         <start-class>org.openjdk.jmh.Main</start-class>

@@ -15,12 +15,7 @@
  */
 package com.example.boot;
 
-import java.util.Collections;
-
 import com.example.config.ApplicationBuilder;
-
-import reactor.core.publisher.Mono;
-
 import org.springframework.boot.Banner.Mode;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.WebApplicationType;
@@ -30,6 +25,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import reactor.core.publisher.Mono;
+
+import java.util.Collections;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -39,7 +37,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
  * @author Dave Syer
  *
  */
-@SpringBootConfiguration(proxyBeanMethods = false)
+@SpringBootConfiguration
 @EnableWebFlux
 // @Import(LazyInitBeanFactoryPostProcessor.class)
 public class BootApplication {

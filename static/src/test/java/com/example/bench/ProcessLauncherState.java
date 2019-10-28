@@ -15,6 +15,17 @@
  */
 package com.example.bench;
 
+import com.example.config.ShutdownApplicationListener;
+import com.example.config.StartupApplicationListener;
+import com.example.demo.DemoApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.loader.archive.Archive;
+import org.springframework.boot.loader.thin.ArchiveUtils;
+import org.springframework.boot.loader.thin.DependencyResolver;
+import org.springframework.boot.loader.thin.PathResolver;
+import org.springframework.util.ReflectionUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -25,18 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import com.example.config.ShutdownApplicationListener;
-import com.example.config.StartupApplicationListener;
-import com.example.demo.DemoApplication;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.boot.loader.archive.Archive;
-import org.springframework.boot.loader.thin.ArchiveUtils;
-import org.springframework.boot.loader.thin.DependencyResolver;
-import org.springframework.boot.loader.thin.PathResolver;
-import org.springframework.util.ReflectionUtils;
 
 public class ProcessLauncherState {
 
@@ -53,7 +52,7 @@ public class ProcessLauncherState {
 	private List<String> progs = new ArrayList<>();
 
 	private static List<String> DEFAULT_JVM_ARGS = Arrays.asList("-Xmx128m", "-cp", "",
-			"-Djava.security.egd=file:/dev/./urandom", "-Xlog:class+path=info", // "-noverify",
+			"-Djava.security.egd=file:/dev/./urandom", //"-noverify",
 			"-Dspring.main.lazy-initialization=true", "-Dspring.jmx.enabled=false");
 
 	private File home;
@@ -205,6 +204,7 @@ public class ProcessLauncherState {
 	}
 
 	public void run() throws Exception {
+		after();
 		List<String> jvmArgs = new ArrayList<>(this.args);
 		customize(jvmArgs);
 		started = exec(jvmArgs.toArray(new String[0]), this.progs.toArray(new String[0]));
